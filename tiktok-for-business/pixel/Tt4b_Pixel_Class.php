@@ -68,9 +68,6 @@ class Tt4b_Pixel_Class {
 		];
 
 		$user         = self::get_user();
-		$hashed_email = $user['email'];
-		$hashed_phone = $user['phone'];
-
 		$url = '';
 		if ( isset( $_SERVER['HTTP_HOST'] ) && isset( $_SERVER['REQUEST_URI'] ) ) {
 			$url = esc_url_raw( wp_unslash( $_SERVER['HTTP_HOST'] ) . wp_unslash( $_SERVER['REQUEST_URI'] ) );
@@ -105,7 +102,7 @@ class Tt4b_Pixel_Class {
 		$mapi->mapi_post( 'event/track/', $fields['access_token'], $params, 'v1.3' );
 
 		// js pixel track
-		self::enqueue_event( $event, $fields['pixel_code'], $properties, $hashed_email, $hashed_phone, $event_id, $user['first_name'], $user['last_name'], $user['city'], $user['state'], $user['country'], $user['zip_code'] );
+		self::enqueue_event( $event, $fields['pixel_code'], $properties, $event_id, $user );
 
 	}
 
@@ -155,9 +152,6 @@ class Tt4b_Pixel_Class {
 		];
 
 		$user         = self::get_user();
-		$hashed_email = $user['email'];
-		$hashed_phone = $user['phone'];
-
 		$url = '';
 		if ( isset( $_SERVER['HTTP_HOST'] ) && isset( $_SERVER['REQUEST_URI'] ) ) {
 			$url = esc_url_raw( wp_unslash( $_SERVER['HTTP_HOST'] ) . wp_unslash( $_SERVER['REQUEST_URI'] ) );
@@ -190,7 +184,7 @@ class Tt4b_Pixel_Class {
 		$mapi->mapi_post( 'event/track/', $fields['access_token'], $params, 'v1.3' );
 
 		// js pixel track
-		self::enqueue_event( $event, $fields['pixel_code'], $properties, $hashed_email, $hashed_phone, $event_id, $user['first_name'], $user['last_name'], $user['city'], $user['state'], $user['country'], $user['zip_code'] );
+		self::enqueue_event( $event, $fields['pixel_code'], $properties, $event_id, $user );
 
 	}
 
@@ -239,9 +233,6 @@ class Tt4b_Pixel_Class {
 		}
 
 		$user         = self::get_user();
-		$hashed_email = $user['email'];
-		$hashed_phone = $user['phone'];
-
 		$url = '';
 		if ( isset( $_SERVER['HTTP_HOST'] ) && isset( $_SERVER['REQUEST_URI'] ) ) {
 			$url = esc_url_raw( wp_unslash( $_SERVER['HTTP_HOST'] ) . wp_unslash( $_SERVER['REQUEST_URI'] ) );
@@ -283,7 +274,7 @@ class Tt4b_Pixel_Class {
 		$mapi->mapi_post( 'event/track/', $fields['access_token'], $params, 'v1.3' );
 
 		// js pixel track
-		self::enqueue_event( $event, $fields['pixel_code'], $properties, $hashed_email, $hashed_phone, $event_id, $user['first_name'], $user['last_name'], $user['city'], $user['state'], $user['country'], $user['zip_code'] );
+		self::enqueue_event( $event, $fields['pixel_code'], $properties, $event_id, $user );
 
 	}
 
@@ -314,7 +305,6 @@ class Tt4b_Pixel_Class {
 			return;
 		}
 
-		// format of js and s2s payloads differ
 		$event_contents = [];
 		$value              = 0;
 		$event_id           = self::get_event_id( '' );
@@ -329,9 +319,6 @@ class Tt4b_Pixel_Class {
 		}
 
 		$user         = self::get_user();
-		$hashed_email = $user['email'];
-		$hashed_phone = $user['phone'];
-
 		$url = '';
 		if ( isset( $_SERVER['HTTP_HOST'] ) && isset( $_SERVER['REQUEST_URI'] ) ) {
 			$url = esc_url_raw( wp_unslash( $_SERVER['HTTP_HOST'] ) . wp_unslash( $_SERVER['REQUEST_URI'] ) );
@@ -369,7 +356,8 @@ class Tt4b_Pixel_Class {
 		$mapi->mapi_post( 'event/track/', $fields['access_token'], $params, 'v1.3' );
 
 		// js pixel track
-		self::enqueue_event( $event, $fields['pixel_code'], $properties, $hashed_email, $hashed_phone, $event_id, $user['first_name'], $user['last_name'], $user['city'], $user['state'], $user['country'], $user['zip_code'] );
+		self::enqueue_event( $event, $fields['pixel_code'], $properties, $event_id, $user );
+
 	}
 
 	/**
@@ -487,14 +475,6 @@ class Tt4b_Pixel_Class {
 			'user_agent'  => $user_agent,
 			'locale'      => strtok( get_locale(), '_' ),
 			'external_id' => $external_id,
-			'email' => '',
-			'phone' => '',
-			'first_name' => '',
-			'last_name' => '',
-			'zip_code' => '',
-			'city' => '',
-			'state' => '',
-			'country' => '',
 		];
 
 		if ( isset( $_COOKIE[ self::TTCLID_COOKIE ] ) ) {
@@ -506,13 +486,24 @@ class Tt4b_Pixel_Class {
 		}
 
 		if ( $advanced_matching ) {
-			$user['city'] = strtolower( str_replace(' ', '', get_user_meta( $user_id, 'billing_city', true ) ) );
-			$user['state'] = strtolower( get_user_meta( $user_id, 'billing_state', true ) );
-			$user['country'] = strtolower( get_user_meta( $user_id, 'billing_country', true ) );
+			$billing_city = strtolower( str_replace(' ', '', get_user_meta( $user_id, 'billing_city', true ) ) );
+			if ( '' !== $billing_city ) {
+				$user['city'] = $billing_city;
+			}
+
+			$billing_state = strtolower( str_replace(' ', '', get_user_meta( $user_id, 'billing_state', true ) ) );
+			if ( '' !== $billing_state ) {
+				$user['state'] = $billing_state;
+			}
+
+			$billing_country = strtolower( str_replace(' ', '', get_user_meta( $user_id, 'billing_country', true ) ) );
+			if ( '' !== $billing_country ) {
+				$user['country'] = $billing_country;
+			}
 
 			// hash email, phone, first name, last name, zip, and add to $user object.
 			$user = $pixel_obj->add_advanced_matching_hashed_info( $email, $user, 'email' );
-			$user = $pixel_obj->add_advanced_matching_hashed_info( $phone_number, $user, 'phone' );
+			$user = $pixel_obj->add_advanced_matching_hashed_info( $phone_number, $user, 'phone_number' );
 			$user = $pixel_obj->add_advanced_matching_hashed_info( $first_name, $user, 'first_name' );
 			$user = $pixel_obj->add_advanced_matching_hashed_info( $last_name, $user, 'last_name' );
 			$user = $pixel_obj->add_advanced_matching_hashed_info( $zip_code, $user, 'zip_code' );
@@ -569,7 +560,6 @@ class Tt4b_Pixel_Class {
 	 */
 	public function add_advanced_matching_hashed_info( $info, $user, $identifier ) {
 		if ( '' === $info ) {
-			$user[$identifier] = $info;
 			return $user;
 		}
 		$hashed_info = hash( 'SHA256', strtolower( $info ) );
@@ -784,28 +774,31 @@ class Tt4b_Pixel_Class {
 	 *
 	 * @return string
 	 */
-	private static function prepare_advanced_matching( $pixel_code, $hashed_email, $hashed_phone, $first_name, $last_name, $city, $state, $country, $zip_code ) {
+	private static function prepare_advanced_matching( $pixel_code, $user ) {
+		$fields = [
+			'email' => 'email',
+			'phone_number' => 'phone_number',
+			'first_name' => 'first_name',
+			'last_name' => 'last_name',
+			'city' => 'city',
+			'state' => 'state',
+			'country' => 'country',
+			'zip_code' => 'zip_code'
+		];
+
+		$jsFields = [];
+		foreach ( $fields as $jsKey => $phpKey ) {
+			if ( isset ( $user[$phpKey] ) ) {
+				$jsFields[] = sprintf("%s: '%s'", $jsKey, $user[$phpKey]);
+			}
+		}
+		$jsObject = implode(",\n            ", $jsFields);
 		return sprintf(
-			'ttq.instance(\'%s\').identify({
-            email: \'%s\',
-            phone_number: \'%s\',
-            first_name: \'%s\',
-            last_name: \'%s\',
-            city: \'%s\',
-            state: \'%s\',
-            country: \'%s\',
-            zip_code: \'%s\'
-            })',
+			"ttq.instance('%s').identify({\n            %s\n            })",
 			$pixel_code,
-			$hashed_email,
-			$hashed_phone,
-			$first_name,
-			$last_name,
-			$city,
-			$state,
-			$country,
-			$zip_code
+			$jsObject
 		);
+
 	}
 
 	/**
@@ -840,8 +833,8 @@ class Tt4b_Pixel_Class {
 	 *
 	 * @return void
 	 */
-	private static function enqueue_event( $event, $pixel_code, $data, $hashed_email, $hashed_phone, $event_id, $first_name, $last_name, $city, $state, $country, $zip_code ) {
-		self::$events[ self::prepare_event_code( $event, $pixel_code, $data, $event_id ) ] = self::prepare_advanced_matching( $pixel_code, $hashed_email, $hashed_phone, $first_name, $last_name, $city, $state, $country, $zip_code );
+	private static function enqueue_event( $event, $pixel_code, $data, $event_id, $user ) {
+		self::$events[ self::prepare_event_code( $event, $pixel_code, $data, $event_id ) ] = self::prepare_advanced_matching( $pixel_code, $user );
 	}
 
 	/**
@@ -898,8 +891,6 @@ class Tt4b_Pixel_Class {
 
 		$event_id = self::get_event_id( '' );
 		$user         = self::get_user();
-		$hashed_email = $user['email'];
-		$hashed_phone = $user['phone'];
 
 		$url = '';
 		if ( isset( $_SERVER['HTTP_HOST'] ) && isset( $_SERVER['REQUEST_URI'] ) ) {
@@ -940,7 +931,7 @@ class Tt4b_Pixel_Class {
 		$mapi->mapi_post( 'event/track/', $fields['access_token'], $params, 'v1.3' );
 
 		// js pixel track
-		self::enqueue_event( $event, $fields['pixel_code'], [], $hashed_email, $hashed_phone, $event_id, $user['first_name'], $user['last_name'], $user['city'], $user['state'], $user['country'], $user['zip_code'] );
+		self::enqueue_event( $event, $fields['pixel_code'], [], $event_id, $user );
 	}
 
 	public function get_key( $key ) {
