@@ -1,4 +1,8 @@
 *** Changelog ***
+== Changelog ==
+2024-10-30 - version 1.2.10
+* Fix - WordPress and WooCommerce compatibility
+
 2024-10-28 - version 1.2.9
 * Fix - Email Coverage
 
