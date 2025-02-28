@@ -2,8 +2,8 @@
 Contributors: tiktokforbusiness, woocommerce, automattic
 Tags: tiktok
 Requires at least: 5.7.0
-Tested up to: 6.6.2
-Stable tag: 1.2.10
+Tested up to: 6.7.2
+Stable tag: 1.3.1
 Requires PHP: 7.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -191,6 +191,12 @@ Order Cancellations, returns, and refunds can only be managed in [Seller Center.
 Please [open a support ticket](https://woo.com/contact-us/).
 
 == Changelog ==
+2025-02-26 - version 1.3.1
+* Update - Updating version
+
+2024-12-11 - version 1.3.0
+* Update - Updating catalog sync functionality
+
 2024-10-30 - version 1.2.10
 * Fix - WordPress and WooCommerce compatibility
 
